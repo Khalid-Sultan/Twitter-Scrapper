@@ -9,7 +9,6 @@ def get_tweet_text(tweet):
     tweet_text = tweet_text_box.text
     for image_in_tweet_tag in images_in_tweet_tag:
         tweet_text = tweet_text.replace(image_in_tweet_tag.text, '')
-
     return tweet_text
 
 def get_this_page_tweets(soup):
@@ -21,8 +20,6 @@ def get_this_page_tweets(soup):
             tweet_data = get_tweet_text(tweet)
         except Exception as e:
             continue
-            #ignore if there is any loading or tweet error
-
         if tweet_data:
             tweets_list.append(tweet_data)
             print(".", end="")
@@ -69,28 +66,25 @@ def dump_data(username, tweets):
     filename = username+"_twitter.json"
     print("\nDumping data in file " + filename)
     data = dict()
-    data["tweets"] = tweets
+    data["posted_tweets"] = tweets
     with open(filename, 'w') as fh:
         fh.write(json.dumps(data))
 
     return filename
 
-
-def get_username():
+def start(username = None):
+    #First Get The Username given
     # if username is not passed
     if len(sys.argv) < 2:
-        usage()
+        print("Please run it again as python scraper.py <UserName>")
+        sys.exit(1)
     username = sys.argv[1].strip().lower()
     if not username:
-        usage()
+        print("Please run it again as python scraper.py <UserName>")
+        sys.exit(1)
 
-    return username
-
-
-def start(username = None):
-    username = get_username()
-    url = "http://www.twitter.com/" + username
-    print("\n\nDownloading tweets for " + username)
+    print("\n\t\tLoading Tweets : " + username)
+    url = "https://www.twitter.com/" + username
     response = None
     try:
         response = requests.get(url)
@@ -109,7 +103,6 @@ def start(username = None):
         sys.exit(1)
 
     tweets = get_tweets_data(username, soup)
-    # dump data in a text file
     dump_data(username, tweets)
     print(str(len(tweets))+" tweets dumped.")
 
